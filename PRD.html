@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shift & Production Form</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    .table input { width: 100%; }
+    .table td, .table th { vertical-align: middle; }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white text-center">
+        <h4 class="mb-0">Shift Information & Production Entry</h4>
+      </div>
+      <div class="card-body">
+        <form>
+          <!-- Shift Info -->
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="date" class="form-label">Date</label>
+              <input type="date" id="date" name="date" class="form-control" />
+            </div>
+            <div class="col-md-4">
+              <label for="shift" class="form-label">Shift</label>
+              <select id="shift" name="shift" class="form-select">
+                <option value="">--Select Shift--</option>
+                <option value="D">D</option>
+                <option value="M">M</option>
+                <option value="N">N</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="group" class="form-label">Group</label>
+              <select id="group" name="group" class="form-select">
+                <option value="">--Select Group--</option>
+               <option value="A">A</option>
+                <option value="B" selected>B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <label for="safetyPoint" class="form-label">Safety Point</label>
+              <select id="safetyPoint" name="safetyPoint" class="form-select">
+                <option value="">--Select Point--</option>
+                <option value="Dangerous zone">Dangerous zone</option>
+                <option value="Emergency stop and safety devices">Emergency stop and safety devices</option>
+                <option value="Troubleshooting work">Troubleshooting work</option>
+                <option value="Group work">Group work</option>
+                <option value="Height work">Height work</option>
+                <option value="Hoisting work" selected>Hoisting work</option></option>
+                <option value="Sensor">Sensor</option>
+                <option value="Electrical cabinet">Electrical cabinet</option>
+                <option value="Safety incident">Safety incident</option>
+
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="manpower" class="form-label">Manpower</label>
+              <input type="number" id="manpower" name="manpower" class="form-control" min="1" value="8">
+            </div>
+          </div>
+
+          <!-- Production Entry Table -->
+          <h5 class="mb-3">Production Entry</h5>
+          <table class="table table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>Size</th>
+                <th>Actual</th>
+                <th>Target</th>
+                <th>Percentage</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="productionBody"></tbody>
+          </table>
+          <button type="button" class="btn btn-outline-primary mb-4" onclick="addRow()">Add Row</button>
+
+          <!-- Material Table -->
+          <h5 class="mb-3">🛑 Tyres Material Made</h5>
+          <table class="table table-bordered">
+            <thead class="table-danger">
+              <tr><th>Material</th><th>Calculated Quantity</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>PSR PLY</td><td id="psrPlyQty">0</td></tr>
+              <tr><td>PSR SPIRAL</td><td id="psrSpiralQty">0</td></tr>
+              <tr><td>PSR CHAFER</td><td id="psrChaferQty">0</td></tr>
+              <tr><td>TBR N-CH</td><td id="tbrNchQty">0</td></tr>
+              <tr><td>TBR FLIPPER</td><td id="tbrFlipperQty">0</td></tr>
+              <tr><td>PSR BELT</td><td id="psrBeltQty">0</td></tr>
+              <tr><td>TBR PLY</td><td id="tbrPlyQty">0</td></tr>
+              <tr><td>TBR W-CH</td><td id="tbrWchQty">0</td></tr>
+              <tr><td>TBR BELT</td><td id="tbrBeltQty">0</td></tr>
+            </tbody>
+          </table>
+
+          <!-- Summary Table -->
+          <h5 class="mb-3">📦 Total Production Summary</h5>
+          <table class="table table-bordered">
+            <thead class="table-info">
+              <tr>
+                <th>Size Type</th>
+                <th>Total Actual</th>
+                <th>Total Target</th>
+                <th>Percentage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Textile</td>
+                <td id="textileActual">0</td>
+                <td id="textileTarget">0</td>
+                <td id="textilePercent">0%</td>
+              </tr>
+              <tr>
+                <td>Steel</td>
+                <td id="steelActual">0</td>
+                <td id="steelTarget">0</td>
+                <td id="steelPercent">0%</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Lot Table -->
+          <h5 class="mb-3">📋 Lot Table</h5>
+          <table class="table table-bordered">
+            <thead class="table-secondary">
+              <tr>
+                <th>Size</th>
+                <th>Lot No</th>
+                <th>Carts</th>
+              </tr>
+            </thead>
+            <tbody id="lotTableBody"></tbody>
+          </table>
+
+          <!-- Size Change Display Below Table -->
+          <h6 class="mt-4">📌 Size Change Summary</h6>
+          <ul id="sizeChangeList" class="list-group list-group-flush mb-4"></ul>
+          
+          <!-- SCW, Y, R, G Input Section -->
+<h5 class="mb-3">🔢 SCW / Color Metrics</h5>
+<div class="row mb-4">
+  <div class="col-md-3">
+    <label for="scw" class="form-label">SCW</label>
+    <input type="number" id="scw" name="scw" class="form-control" min="0" value="0">
+  </div>
+  <div class="col-md-3">
+  <label for="sr" class="form-label">SR</label>
+  <input type="number" id="sr" name="sr" class="form-control" min="0" value="1">
+</div>
+
+  <div class="col-md-3">
+    <label for="yellow" class="form-label">Y (Yellow)</label>
+    <input type="number" id="yellow" name="yellow" class="form-control" min="0" value="0">
+  </div>
+  <div class="col-md-3">
+    <label for="red" class="form-label">R (Red)</label>
+    <input type="number" id="red" name="red" class="form-control" min="0" value="0">
+  </div>
+  <div class="col-md-3">
+    <label for="green" class="form-label">G (Green)</label>
+    <input type="number" id="green" name="green" class="form-control" min="0" value="0">
+  </div>
+</div>
+
+<h5 class="mb-3">🚨 NOT Table (Troubles Logged)</h5>
+<table class="table table-bordered">
+  <thead class="table-warning">
+    <tr>
+      <th>Sr No</th>
+      <th>Trouble</th>
+      <th>Time Required (minutes)</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="notTableBody"></tbody>
+</table>
+
+<button type="button" class="btn btn-outline-warning mb-4" onclick="addNotRow()">Add Trouble Row</button>
+
+<div class="row mb-3">
+  <div class="col-md-4">
+    <label for="nextSv" class="form-label">Next Shift SV</label>
+    <select id="nextSv" name="nextSv" class="form-select">
+      <option value="">--Select SV--</option>
+      <option value="Purva J san">Purva J san</option>
+      <option value="Satish M san" selected>Satish M san</option>
+      <option value="Omkar S san">Omkar S san</option>
+      <option value="Sachin P san">Sachin P san</option>
+      <option value="Neha H san">Neha H san</option>
+	<option value="Avinash M san">Avinash M san</option>
+    </select>
+  </div>
+</div>
+
+<hr class="my-4">
+<h5 class="mb-3">🛠 PRS Production & Attendance</h5>
+<div class="form-check form-switch mb-3">
+  <input class="form-check-input" type="checkbox" id="prsToggle">
+  <label class="form-check-label" for="prsToggle">Include PRS Production Summary</label>
+</div>
+<div id="prsSection" style="display: none;">
+  <!-- Include your "PRS Production" toggle,
+       TBE/TCAL inputs, and the PRD status table here -->
+
+
+
+<div class="row g-3 mb-3">
+  <div class="col-md-3">
+    <label for="tbeAtt" class="form-label">TBE Attendance</label>
+    <input type="text" id="tbeAtt" class="form-control" placeholder="e.g. 5/8">
+  </div>
+  <div class="col-md-3">
+    <label for="tcalAtt" class="form-label">TCAL Attendance</label>
+    <input type="text" id="tcalAtt" class="form-control" placeholder="e.g. 3/6">
+  </div>
+</div>
+
+<h6 class="mt-3">Saturday/Sunday PRD Status</h6>
+<table class="table table-bordered">
+  <thead class="table-primary">
+    <tr>
+      <th>M/c</th>
+      <th>ACT</th>
+      <th>TRG</th>
+      <th>%</th>
+    </tr>
+  </thead>
+  <tbody id="prsStatusTable">
+    <tr>
+      <td>2RHA</td>
+      <td><input type="number" class="form-control prs-act" min="0"></td>
+      <td><input type="number" class="form-control prs-trg" min="0"></td>
+      <td class="prs-pct text-center align-middle">0%</td>
+    </tr>
+    <tr>
+      <td>CCH</td>
+      <td><input type="number" class="form-control prs-act" min="0"></td>
+      <td><input type="number" class="form-control prs-trg" min="0"></td>
+      <td class="prs-pct text-center align-middle">0%</td>
+    </tr>
+    <tr>
+      <td>POLY</td>
+      <td><input type="number" class="form-control prs-act" min="0"></td>
+      <td><input type="number" class="form-control prs-trg" min="0"></td>
+      <td class="prs-pct text-center align-middle">0%</td>
+    </tr>
+    <tr>
+      <td>CHIP</td>
+      <td><input type="number" class="form-control prs-act" min="0"></td>
+      <td><input type="number" class="form-control prs-trg" min="0"></td>
+      <td class="prs-pct text-center align-middle">0%</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+<button type="button" class="btn btn-info mt-3 me-2" onclick="previewWhatsAppMessage()">Preview WhatsApp Message</button>
+<button type="button" class="btn btn-success mt-3" onclick="sendPreviewedMessage()">Send This Message</button>
+<div class="mb-3">
+  <label for="whatsappPreview" class="form-label">📤 WhatsApp Message Preview</label>
+  <textarea id="whatsappPreview" class="form-control" rows="10" readonly></textarea>
+</div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-success mt-3">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+<script>
+  document.getElementById("date").value = new Date().toISOString().split("T")[0];
+
+  function addRow() {
+  const tbody = document.getElementById("productionBody");
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>
+      <select class="form-select" name="size[]">
+        <option value="">--Select Size--</option>
+        <option value="2052">2052</option>
+        <option value="2014">2014</option>
+        <option value="2056">2056</option>
+        <option value="JA100B">JA100B</option>
+        <option value="7044">7044</option>
+        <option value="JK100B">JK100B</option>
+        <option value="657">657</option>
+        <option value="6054">6054</option>
+        <option value="70K5">70K5</option>
+        <option value="S0103">S0103</option>
+        <option value="S0013">S0013</option>
+        <option value="S0160">S0160</option>
+        <option value="S0191">S0191</option>
+        <option value="SB088">SB088</option>
+        <option value="S1731">S1731</option>
+        <option value="S3024">S3024</option>
+        <option value="S0348">S0348</option>
+        <option value="S0414">S0414</option>
+        <option value="S0645">S0645</option>
+        <option value="S0649">S0649</option>
+        <option value="S0635">S0635</option>
+        <option value="S0644">S0644</option>
+      </select>
+    </td>
+    <td><input type="number" class="form-control actual" name="actual[]" min="0" oninput="calculateRow(this)"></td>
+    <td><input type="number" class="form-control target" name="target[]" min="1" oninput="calculateRow(this)"></td>
+    <td><input type="text" class="form-control percentage" name="percentage[]" readonly></td>
+    <td><button type="button" class="btn btn-danger btn-sm" onclick="deleteRow(this)">×</button></td>
+  `;
+  tbody.appendChild(row);
+}
+
+  function deleteRow(button) {
+    button.closest("tr").remove();
+    updateMaterialTable();
+    updateSummaryTable();
+    updateLotTable();
+  }
+
+  function calculateRow(input) {
+    const row = input.closest("tr");
+    const actual = parseFloat(row.querySelector(".actual").value) || 0;
+    const target = parseFloat(row.querySelector(".target").value) || 0;
+    row.querySelector(".percentage").value = target > 0 ? ((actual / target) * 100).toFixed(1) + "%" : "";
+    updateMaterialTable();
+    updateSummaryTable();
+    updateLotTable();
+  }
+
+  const materialCategories = {
+    psrPly: ["2052", "2014", "2056", "JA100B"],
+    psrSpiral: ["7044", "JK100B"],
+    psrChafer: ["657"],
+    tbrNch: ["6054"],
+    tbrFlipper: ["70K5"],
+    psrBelt: ["S0103", "S0013", "S0160", "S0191", "SB088", "S1731", "S3024"],
+    tbrPly: ["S0348"],
+    tbrWch: ["S0414"],
+    tbrBelt: ["S0645", "S0649", "S0635", "S0644"]
+  };
+
+  const materialFormulas = {
+    psrPly: a => ((a - a * 0.01) / 0.73),
+    psrSpiral: a => ((a - a * 0.01) / 0.27),
+    psrChafer: a => ((a - a * 0.01) / 0.09),
+    tbrNch: a => ((a - a * 0.01) / 0.717),
+    tbrFlipper: a => ((a - a * 0.01) / 0.15),
+    psrBelt: a => ((a - a * 0.01) / 0.48),
+    tbrPly: a => ((a - a * 0.01) / 1.23),
+    tbrWch: a => ((a - a * 0.01) / 0.37),
+    tbrBelt: a => ((a - a * 0.01) / 1.57)
+  };
+
+  function updateMaterialTable() {
+    const rows = document.querySelectorAll("#productionBody tr");
+    const totals = {};
+    for (const cat in materialCategories) totals[cat] = 0;
+
+    rows.forEach(row => {
+      const size = row.querySelector('[name="size[]"]').value.trim();
+      const actual = parseFloat(row.querySelector('[name="actual[]"]').value) || 0;
+      for (const cat in materialCategories) {
+        if (materialCategories[cat].includes(size)) {
+          totals[cat] += actual;
+          break;
+        }
+      }
+    });
+
+    for (const cat in totals) {
+      const actual = totals[cat];
+      const result = actual > 0 ? materialFormulas[cat](actual).toFixed(2) : 0;
+      document.getElementById(`${cat}Qty`).textContent = result;
+    }
+  }
+
+  function updateSummaryTable() {
+    let textileActual = 0, textileTarget = 0;
+    let steelActual = 0, steelTarget = 0;
+
+    const rows = document.querySelectorAll("#productionBody tr");
+    rows.forEach(row => {
+      const size = row.querySelector('[name="size[]"]').value.trim();
+      const actual = parseFloat(row.querySelector('[name="actual[]"]').value) || 0;
+      const target = parseFloat(row.querySelector('[name="target[]"]').value) || 0;
+      if (size.toUpperCase().startsWith("S")) {
+        steelActual += actual;
+        steelTarget += target;
+      } else {
+        textileActual += actual;
+        textileTarget += target;
+      }
+    });
+
+    document.getElementById("steelActual").textContent = steelActual;
+    document.getElementById("steelTarget").textContent = steelTarget;
+    document.getElementById("steelPercent").textContent = steelTarget > 0 ? ((steelActual / steelTarget) * 100).toFixed(1) + "%" : "0%";
+
+    document.getElementById("textileActual").textContent = textileActual;
+    document.getElementById("textileTarget").textContent = textileTarget;
+    document.getElementById("textilePercent").textContent = textileTarget > 0 ? ((textileActual / textileTarget) * 100).toFixed(1) + "%" : "0%";
+  }
+
+  function updateLotTable() {
+    const lotBody = document.getElementById("lotTableBody");
+    lotBody.innerHTML = "";
+    const sizeChangeList = document.getElementById("sizeChangeList");
+    sizeChangeList.innerHTML = "";
+
+    const rows = document.querySelectorAll("#productionBody tr");
+    const sizeStats = {};
+
+    rows.forEach(row => {
+      const size = row.querySelector('[name="size[]"]').value.trim();
+      const actual = parseFloat(row.querySelector('[name="actual[]"]').value) || 0;
+      if (!size) return;
+      if (!sizeStats[size]) {
+        sizeStats[size] = { total: 0, filled: 0 };
+      }
+      sizeStats[size].total += 1;
+      if (actual > 0) sizeStats[size].filled += 1;
+    });
+
+    for (const size in sizeStats) {
+      const { total, filled } = sizeStats[size];
+
+      const actualRow = Array.from(rows).reverse().find(row =>
+        row.querySelector('[name="size[]"]').value.trim() === size
+      );
+      const actual = actualRow
+        ? parseFloat(actualRow.querySelector('[name="actual[]"]').value) || 0
+        : 0;
+
+      let lotNo;
+      if (size.startsWith("S")) lotNo = actual / 350;
+      else if (["657", "70K5", "JA100B"].includes(size)) lotNo = actual / 400;
+      else lotNo = actual / 620;
+
+      const carts = size.startsWith("S") ? "Carts" : "Big Roll";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${size}</td>
+        <td>${Math.round(lotNo)}</td>
+        <td>${carts}</td>
+      `;
+      lotBody.appendChild(tr);
+
+      const li = document.createElement("li");
+      li.className = "list-group-item";
+      //li.textContent = `${size} (${filled}/${total})`;
+      //sizeChangeList.appendChild(li);
+    }
+
+    // Total size change summary
+    const totalSizes = Object.keys(sizeStats).length;
+    let totalFilled = 0;
+    for (const size in sizeStats) {
+      totalFilled += sizeStats[size].filled > 0 ? 1 : 0;
+    }
+
+    const totalSummary = document.createElement("li");
+    totalSummary.className = "list-group-item fw-bold";
+    totalSummary.textContent = `*Size Change:* ${totalFilled}/${totalSizes}`;
+    sizeChangeList.appendChild(totalSummary);
+  }
+  
+  function addNotRow() {
+  const tbody = document.getElementById("notTableBody");
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td></td>
+    <td><input type="text" class="form-control" name="trouble[]"></td>
+    <td><input type="number" class="form-control" name="timeRequired[]" min="0"></td>
+    <td><button type="button" class="btn btn-danger btn-sm" onclick="deleteNotRow(this)">×</button></td>
+  `;
+  tbody.appendChild(row);
+  updateNotSrNo();
+}
+
+function deleteNotRow(button) {
+  button.closest("tr").remove();
+  updateNotSrNo();
+}
+
+function updateNotSrNo() {
+  const rows = document.querySelectorAll("#notTableBody tr");
+  rows.forEach((row, index) => {
+    row.querySelector("td:first-child").textContent = index + 1;
+  });
+}
+
+document.getElementById("prsToggle").addEventListener("change", function () {
+  const prsSection = document.getElementById("prsSection");
+  prsSection.style.display = this.checked ? "block" : "none";
+});
+
+function previewWhatsAppMessage() {
+  const date = document.getElementById("date").value;
+  const shift = document.getElementById("shift").value;
+  const group = document.getElementById("group").value;
+  const safety = document.getElementById("safetyPoint").value;
+  const manpower = document.getElementById("manpower").value;
+  const sv = document.getElementById("nextSv").value;
+  const scw = document.getElementById("scw")?.value || "";
+  const sr = document.getElementById("sr")?.value || "";
+  const y = document.getElementById("yellow")?.value || "";
+  const r = document.getElementById("red")?.value || "";
+  const g = document.getElementById("green")?.value || "";
+
+  let message = `🛑 *Big Calender Results*\n`;
+  message += `Date: ${date}\nShift: ${shift}\nGroup: ${group}\nSafety: ${safety}\nManpower: ${manpower}\n\n`;
+
+
+  const textileActual = document.getElementById("textileActual").textContent;
+  const textileTarget = document.getElementById("textileTarget").textContent;
+  const textilePercent = document.getElementById("textilePercent").textContent;
+
+  const steelActual = document.getElementById("steelActual").textContent;
+  const steelTarget = document.getElementById("steelTarget").textContent;
+  const steelPercent = document.getElementById("steelPercent").textContent;
+
+  message += `*Results (Actual/ Order)*\n`;
+  message += `Textile: ${textileActual}/${textileTarget} (${textilePercent})\n`;
+  message += `Steel: ${steelActual}/${steelTarget} (${steelPercent})\n\n`;
+
+  message += `* NUMBER OF LOTS*\n`;
+  const lotRows = document.querySelectorAll("#lotTableBody tr");
+  lotRows.forEach((row, index) => {
+    const size = row.cells[0]?.textContent;
+    const lot = row.cells[1]?.textContent;
+    const carts = row.cells[2]?.textContent;
+    message += `${index + 1}. ${size}: ${lot} ${carts}\n`;
+  });
+
+  //message += `\n*📌 SIZE CHANGE*\n`;
+  const changes = document.querySelectorAll("#sizeChangeList li");
+  changes.forEach((li) => {
+    message += `\n${li.textContent}\n`;
+  });
+  message += `\nSCW: ${scw}  \nSR: ${sr}\nY: ${y} \nR: ${r}\nG: ${g}\n\n`;
+  
+  message += `*TYRES MATERIAL MADE*\n`;
+message += `PSR PLY: ${document.getElementById("psrPlyQty").textContent}\n`;
+message += `PSR SPIRAL: ${document.getElementById("psrSpiralQty").textContent}\n`;
+message += `PSR CHAFER: ${document.getElementById("psrChaferQty").textContent}\n`;
+message += `TBR N-CH: ${document.getElementById("tbrNchQty").textContent}\n`;
+message += `TBR FLIPPER: ${document.getElementById("tbrFlipperQty").textContent}\n`;
+message += `PSR BELT: ${document.getElementById("psrBeltQty").textContent}\n`;
+message += `TBR PLY: ${document.getElementById("tbrPlyQty").textContent}\n`;
+message += `TBR W-CH: ${document.getElementById("tbrWchQty").textContent}\n`;
+message += `TBR BELT: ${document.getElementById("tbrBeltQty").textContent}\n`;
+  
+  message += `\n*NOT :*\n`;
+  
+  const notRows = document.querySelectorAll("#notTableBody tr");
+  notRows.forEach((row, index) => {
+    const trouble = row.querySelector('[name="trouble[]"]').value.trim();
+    const time = row.querySelector('[name="timeRequired[]"]').value.trim();
+    message += `${index + 1}. ${trouble} - ${time} min\n`;
+  });
+  
+  // Append PRS section only if checkbox is enabled
+if (document.getElementById("prsToggle").checked) {
+  const tbe = document.getElementById("tbeAtt").value || "0/0";
+  const tcal = document.getElementById("tcalAtt").value || "0/0";
+  message += `\n🔷 *PRS PRODUCTION STATUS*\n`;
+  message += `TBE: ${tbe}  TCAL: ${tcal}\n`;
+
+  const rows = document.querySelectorAll("#prsStatusTable tr");
+  rows.forEach(row => {
+    const m = row.cells[0].textContent.trim();
+    const act = parseFloat(row.querySelector(".prs-act").value) || 0;
+    const trg = parseFloat(row.querySelector(".prs-trg").value) || 0;
+    const pct = trg > 0 ? ((act / trg) * 100).toFixed(1) + "%" : "0%";
+    row.querySelector(".prs-pct").textContent = pct;
+    message += `${m}: ${act}/${trg} (${pct})\n`;
+  });
+}
+
+  message += `\nNext shift SV: ${sv}`;
+  
+  const previewBox = document.getElementById("whatsappPreview");
+  if (previewBox) {
+    previewBox.value = message;
+  }
+} 
+function sendPreviewedMessage() {
+  const message = document.getElementById("whatsappPreview").value.trim();
+  if (!message) {
+    alert("Preview is empty. Click the 'Preview WhatsApp Message' button first.");
+    return;
+  }
+  const phone = "917058975363"; // Your target number
+  const encoded = encodeURIComponent(message);
+  const url = `https://wa.me/${phone}?text=${encoded}`;
+  window.open(url, "_blank");
+}
+</script>
+
+</body>
+</html>
